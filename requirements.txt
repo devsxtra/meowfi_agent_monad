@@ -1,0 +1,7 @@
+crewai==0.98.0
+crewai-tools==0.32.1
+pandas_ta==0.3.14b0
+subgrounds==1.9.1
+Flask==3.1.0
+flask-cors==5.0.1
+allora_sdk==0.2.0

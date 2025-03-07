@@ -1,17 +1,145 @@
-research_task:
-  description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+parse_user_input:
+  description: |
+    Analyze natural language input to identify DeFi pool preferences, focusing on protocol characteristics and chain preferences.
+    Convert numerical values and implied preferences using these mappings:
+    - TVL references: "high" (>$10M), "low" (<$1M)
+    - Chain mentions: "arbitrum" (Arbitrum L2), "base" (Coinbase L2)
+    - Pool types: "stablecoin" (USD-pegged), "bluechip" (Top 10 assets)
+    - risk: "stablecoin" (USD-pegged), "bluechip" (Top 10 assets)
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Extract ONLY these parameters:
+    - pool_type (stablecoin/bluechip)
+    - tvlUSD (high/low)
+    - chain (arbitrum/base/all)
+    - risk (low/medium/high)
+    - symbol (if user input contains any symbol else leave it)
+
+    Interpretation rules:
+    1. Default to chain="all" if no chain mentioned
+    2. "High liquidity" → tvlUSD: high
+    3. Only detect L2 chains (ignore mainnet mentions)
+    4. "ETH/BTC pool" → pool_type: bluechip
+    5. "USDC/USDT" → pool_type: stablecoin
+    6. Explicit chain mentions override defaults
+    7. Partial matches: "Arb" → arbitrum, "CB" → base
+    8. If risk is not explicitly mentioned then get it from intent of user if still unclear then consider it to be medium
+    9. If symbol is not explicitly mentioned then ignore it in output
+    10. Each key (pool_type, tvlUSD, chain, risk, symbol) must have exactly ONE value—no lists or multiple values are allowed.
+    
+    
+    Output MUST be a flat dictionary with EXACTLY:
+      Examples:
+        Input: "Looking for low TVL bluechip pools"
+        Output: {{ "pool_type": "bluechip", "tvlUSD": "low", "chain": "all" , risk:"high",symbol:""}}
+    
+        Input: "Stable pools on Arb"
+        Output: {{ "pool_type": "stablecoin", "tvlUSD": "high", "chain": "arbitrum" , risk:"low","symbol:""}}
+    
+        Input: "Maximize my eth apr on arbitrum on low risk"
+        Output: {{ "pool_type": "bluechip", "tvlUSD": "high", "chain": "arbitrum" , risk:"low","symbol:"ETH"}}
+    
+        Input: "How can I earn a stable and consistent yield on my USDC with minimal risk?"
+        Output: {{ "pool_type": "stablecoin", "tvlUSD": "high", "chain": "all" , risk:"low","symbol:"USDC"}}
+    
+        Input: "Maximise APR of cbBTC with Low Risk?"
+        Output: {{ "pool_type": "bluechip", "tvlUSD": "high", "chain": "all" , risk:"low","symbol:"cbBTC"}}
+    
+        Input: "Best yield strategy for ETH & Stablecoin on Arbitrum"
+        Output: {{ "pool_type": "stablecoin", "tvlUSD": "high", "chain": "arbitrum" , risk:"medium","symbol:"ETH"}}
+
+    User Input: {user_input}
+  expected_output: |
+    
+    {
+      "pool_type": "stablecoin"|"bluechip",
+      "tvlUSD": "high"|"low",
+      "chain": "arbitrum"|"base"|"all"
+      "risk": "low"|"medium"|"high"
+      "symbol": user mentioned symbol else ""
+    }
+  agent: defi_agent
+
+
+data_aggregator:
+  description: |
+    Develop DeFi investment strategies using filtered user parameters and real-time pool data.
+    Process:
+      1. Pass filters directly as dictionary to GetPoolData (no nesting)
+      2. Example valid input format:
+         {{
+           "pool_type": "stablecoin",
+           "tvlUSD": "high", 
+           "chain": "base",
+          "risk":"low"
+          "symbol":"USDe"
+         }}
+    cumulate all data from tool and aggregate it without making any change to it
+  
+
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    JSON array containing structured output. Format:
+    [
+      {
+        "pool_id": string,
+        "chain": string,
+        "tvl_usd": integer,
+        "txn_count": integer,
+        "fullname":"[token0_symbol]-[token1_symbol]",
+        "token0_volatility_30day": float ,
+        "token1_volatility_30day": float ,
+        "gini_coefficient": float ,
+        "hhi": float ,
+        "total_volume": float ,
+        "total_fees": float ,
+        "average_fees_rate": float ,
+        "daily_apr": float ,
+        "average_apr": float ,
+        "current_price": float ,
+        "pool_range":tuple,
+        "upper_limit_pct":string,
+        "lower_limit_pct":string
+        "projected_apr":float
+      }
+    ]
+
+  agent: aggregator_agent
+
+
+
+
+lp_pool_analysis_task:
+  description: >
+    Conduct a deep analysis of the LP pool data provided from the previous task, extracting key performance metrics with a specialist approach. Your goal is to deliver a high-level, trader-focused breakdown of the pool’s efficiency, profitability, and risks. The following must be computed:
+    
+      1. **Pool Details** – Extract and present core information: pool name & ticker, daily APY, total liquidity, current price, and pool address.
+    
+    
+      4. **Key Risk Metrics:** Assess and report:
+         - **Volatility Profile:** Determine risk levels from price fluctuations.
+         - **Liquidity Concentration:** Evaluate distribution using tick data.
+         - **Volume/TVL Ratio:** A high ratio signals strong fee generation.
+         - **Fee APR:** Profitability from trading activity.
+         - **Impermanent Loss Risk:** Based on historical price movements.
+         - **Liquidity Provider Distribution:** Identify if whales dominate the pool.
+         - **Trading Activity (txCount):** Gauge market participation.
+    
+      5. **Leverage Recommendation** – Provide a leverage suggestion in numeric format (e.g., 3x, 34x), tailored to the pool’s conditions. If risk levels are excessively high, recommend **no leverage** and justify why.
+    
+      6. **Tags** – Provide tags in the form of a list that summarizes the pool’s characteristics (e.g., ["risky", "high_apr", "low_vol","chain type base or arbitrum"]). These tags should offer a quick overview of the pool's properties.
+    
+    Ensure the analysis reflects insights from an experienced trader’s perspective, factoring in the past 30 days of data.
+    
+    **NOTE:** Only show the best three pools, and the output must be a **Python dictionary**, not JSON, a string, or any other format.
+    
+    User Query: {user_input}
+
+  expected_output: >
+    ONLY GIVE A list of dictionary where the top three pools are ranked based on performance, each containing plz DO NOT add any summary or comments just a list of dictionary as output:
+      - "pool_details": { "pool_name", "daily_apy", "total_liquidity", "current_price", "pool_address","chain", "token0_symbol"}
+      - "lp_strategy": { "30_day_annualized_volatility", "gini_coefficient", "hhi_index", "current_price",pool_range,upper_limit_pct,lower_limit_pct, projected_apr }
+      - "projected_apr":Average APR {average_apr}% and Daily APR {daily_apr}
+      - "recommended_leverage": the leverage recommendation based on the pool's provided 30-day volatility and the user's input
+      - "tags": A list of tags summarizing the pool's key properties
+  
+
+  agent: strategist_agent

@@ -1,62 +1,69 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, crew, task
 
-# If you want to run a snippet of code before or after the crew starts, 
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from src.meowfi.tools.custom_tool import GetPoolData
+
 
 @CrewBase
-class Meowfi():
-	"""Meowfi crew"""
+class MeowFiAgent():
+    """Agent Class"""
+    agents_config = 'config/agents.yaml'
 
-	# Learn more about YAML configuration files here:
-	# Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-	# Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-	agents_config = 'config/agents.yaml'
-	tasks_config = 'config/tasks.yaml'
+    tasks_config = 'config/tasks.yaml'
 
-	# If you would like to add tools to your agents, you can learn more about it here:
-	# https://docs.crewai.com/concepts/agents#agent-tools
-	@agent
-	def researcher(self) -> Agent:
-		return Agent(
-			config=self.agents_config['researcher'],
-			verbose=True
-		)
+    llm = LLM(model="gpt-4o", temperature=0.15)
 
-	@agent
-	def reporting_analyst(self) -> Agent:
-		return Agent(
-			config=self.agents_config['reporting_analyst'],
-			verbose=True
-		)
+    @agent
+    def defi_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['defi_agent'],
+            llm=self.llm,
+            verbose=True
+        )
 
-	# To learn more about structured task outputs, 
-	# task dependencies, and task callbacks, check out the documentation:
-	# https://docs.crewai.com/concepts/tasks#overview-of-a-task
-	@task
-	def research_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['research_task'],
-		)
+    @agent
+    def aggregator_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['defi_agent'],
+            llm=self.llm,
+            tools=[GetPoolData()],
+            verbose=True
+        )
 
-	@task
-	def reporting_task(self) -> Task:
-		return Task(
-			config=self.tasks_config['reporting_task'],
-			output_file='report.md'
-		)
+    @agent
+    def strategist_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['defi_analyst'],
+            llm=LLM(model="gpt-4o", temperature=0.2),
+            verbose=True
+        )
 
-	@crew
-	def crew(self) -> Crew:
-		"""Creates the Meowfi crew"""
-		# To learn how to add knowledge sources to your crew, check out the documentation:
-		# https://docs.crewai.com/concepts/knowledge#what-is-knowledge
+    @task
+    def parse_user_input(self) -> Task:
+        return Task(
+            config=self.tasks_config['parse_user_input']
+        )
 
-		return Crew(
-			agents=self.agents, # Automatically created by the @agent decorator
-			tasks=self.tasks, # Automatically created by the @task decorator
-			process=Process.sequential,
-			verbose=True,
-			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
-		)
+    @task
+    def data_aggregator(self) -> Task:
+        return Task(
+            config=self.tasks_config['data_aggregator']
+        )
+
+    @task
+    def lp_pool_analysis_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['lp_pool_analysis_task'],
+        )
+
+    @crew
+    def crew(self) -> Crew:
+        return Crew(
+            agents=[
+                self.defi_agent(), self.strategist_agent(), self.aggregator_agent()],
+            tasks=[
+                self.parse_user_input(), self.data_aggregator(), self.lp_pool_analysis_task()],
+            process=Process.sequential,
+            memory=True,
+            verbose=True
+        )
