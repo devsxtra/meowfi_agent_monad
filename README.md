@@ -1,54 +1,127 @@
-# Meowfi Crew
+# 🐱 Meowfi - AI-Powered DeFi Liquidity Optimization Agent
 
-Welcome to the Meowfi Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+**Meowfi** is an advanced AI agent specializing in decentralized finance (DeFi) liquidity pool analysis and strategy optimization. Designed for both novice and experienced liquidity providers, Meowfi combines on-chain data analysis with machine learning to maximize returns while managing risk across Layer 2 ecosystems.
 
-## Installation
+## 🌟 Key Features
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+### 🧠 Intelligent Liquidity Management
+- **AI-Driven Pool Selection**  
+  Multi-agent system analyzes 30+ parameters including volatility, liquidity concentration, and fee APR
+- **Dynamic Strategy Formulation**  
+  Real-time adaptive strategies based on market conditions and pool metrics
+- **Cross-Chain Optimization**  
+  Native support for Arbitrum and Base networks with modular architecture for chain expansion
 
-First, if you haven't already, install uv:
+### 📊 Advanced Analytics
+- **Risk-Adjusted Yield Scoring**  
+  Proprietary scoring system balancing APY vs impermanent loss risk
+- **Volatility-Weighted Ranges**  
+  Machine learning models predicting optimal liquidity ranges
+- **Liquidity Health Metrics**  
+  Gini Coefficient and HHI Index calculations for concentration risk analysis
 
+### 🛠️ Professional-Grade Tools
+- **Auto-Compounding Strategies**  
+  Smart position management recommendations
+- **Leverage Optimization Engine**  
+  Dynamic leverage suggestions (1-50x) based on volatility profiles
+- **Institutional-Grade Reporting**  
+  Detailed risk metrics and historical performance analysis
+
+### 🤖 AI-Powered Features
+- **Natural Language Interface**  
+  Understands complex trading strategies in plain English
+- **Predictive APR Modeling**  
+  Time-series forecasting of pool performance
+- **Anomaly Detection**  
+  Identifies suspicious pool activity and rug-pull risks
+
+## 🚀 Getting Started
+
+### Requirements
+- Python 3.11+
+- Ethereum-compatible wallet (for future integrations)
+- Subgraph API key (for on-chain data access)
+- Allora Sdk (for strategy building)
+
+### Installation
 ```bash
-pip install uv
+# Clone repository
+git clone https://github.com/devsxtra/meowfi_agent_monad.git
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
 ```
 
-Next, navigate to your project directory and install the dependencies:
+### Configuration
+Update `.env` file with your credentials:
+```ini
+SUBGRAPH_API_KEY=your_api_key_here
+OPENAI_API_KEY=your_api_key_here
+MODEL=gpt-4o-mini
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
 ```
-### Customizing
+## 💻 Usage
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/meowfi/config/agents.yaml` to define your agents
-- Modify `src/meowfi/config/tasks.yaml` to define your tasks
-- Modify `src/meowfi/crew.py` to add your own logic, tools and specific args
-- Modify `src/meowfi/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
+### Start the Flask APP
 ```bash
-$ crewai run
+python3 app.py
+```
+## 💪 Flask API
+
+Meowfi provides a RESTful Flask API that allows users to query DeFi strategies and liquidity insights. 
+
+### Available Endpoints
+
+- **`GET /health`** - Returns the status of the API to ensure it is running correctly.
+- **`POST /query`** - Accepts user queries in JSON format and returns AI-generated liquidity optimization strategies.
+
+### Example Request
+
+```json
+{
+  "query": "What is the best liquidity pool strategy for ETH/USDC?"
+}
 ```
 
-This command initializes the meowfi Crew, assembling the agents and assigning them tasks as defined in your configuration.
+## 🧩 Architecture
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```mermaid
+graph TD
+    A[User Input] --> B(NLP Parser)
+    B --> C{Query Type}
+    C -->|LP Analysis| D[Data Aggregator]
+    C -->|Wallet Analysis| E[On-chain Inspector]
+    D --> F[Risk Calculator]
+    E --> F
+    F --> G[Strategy Optimizer]
+    G --> H[Result Formatter]
+    H --> I[Flask API]
+```
 
-## Understanding Your Crew
+## 🤝 Contributing
 
-The meowfi Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+We welcome contributions! Please follow these steps:
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Support
+## 📚 Tech Stack
 
-For support, questions, or feedback regarding the Meowfi Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+**Core AI**  
+- CrewAI Multi-Agent System
+- GPT-4o Mini Language Model
+- Custom ML Models (like allora network for Volatility Prediction)
 
-Let's create wonders together with the power and simplicity of crewAI.
+**Data Layer**  
+- The Graph Protocol
+- Pandas/Numpy for Analysis
+- AsyncIO Data Fetching
+
+**Interface**  
+- Flask API
+

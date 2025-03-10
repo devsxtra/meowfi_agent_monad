@@ -82,6 +82,8 @@ data_aggregator:
       {
         "pool_id": string,
         "chain": string,
+        "token0_id": string,
+        "token1_id": string,
         "tvl_usd": integer,
         "txn_count": integer,
         "fullname":"[token0_symbol]-[token1_symbol]",
@@ -135,7 +137,7 @@ lp_pool_analysis_task:
 
   expected_output: >
     ONLY GIVE A list of dictionary where the top three pools are ranked based on performance, each containing plz DO NOT add any summary or comments just a list of dictionary as output:
-      - "pool_details": { "pool_name", "daily_apy", "total_liquidity", "current_price", "pool_address","chain", "token0_symbol"}
+      - "pool_details": { "pool_name", "daily_apy", "total_liquidity", "current_price", "pool_address","chain", "token0_symbol", "token0_address", "token1_symbol", "token0_address"}
       - "lp_strategy": { "30_day_annualized_volatility", "gini_coefficient", "hhi_index", "current_price",pool_range,upper_limit_pct,lower_limit_pct, projected_apr }
       - "projected_apr":Average APR {average_apr}% and Daily APR {daily_apr}
       - "recommended_leverage": the leverage recommendation based on the pool's provided 30-day volatility and the user's input

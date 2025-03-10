@@ -192,3 +192,5 @@ ALLORA_TOPIC_ID_MAP = {
     "SOL": {"P": 38, "V": 40},
     "ETH": {"P": 41, "V": 43}
 }
+
+VOLATILITY_THRESHOLD = 0.005

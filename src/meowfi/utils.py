@@ -22,7 +22,7 @@ from src.meowfi.constants import (
     CAMELOT_QUERY_MAPPING,
     RISK_PARAMS, STABLE_COINS_CAMELOT, STABLE_COINS_AERODROME,
     ETHEREUM_COINS_AERODROME, OTHER_COINS_AERODROME, OTHER_COINS_CAMELOT,
-    ETHEREUM_COINS_CAMELOT, VALID_CHAINS, ALLORA_TOPIC_ID_MAP,
+    ETHEREUM_COINS_CAMELOT, VALID_CHAINS, ALLORA_TOPIC_ID_MAP, VOLATILITY_THRESHOLD,
 )
 
 load_dotenv()
@@ -680,20 +680,10 @@ def adjust_ranges_with_predictions(lower, upper, current_price, allora_predictio
     Returns:
         tuple: Adjusted (lower, upper) range values.
     """
-    price_pred = float(allora_predictions.get("price_prediction", current_price))  # Default to current price if missing
-    vol_pred = float(allora_predictions.get("volatility_prediction", 0))  # Default to 0 if missing
+    vol_pred = float(allora_predictions.get("volatility_prediction", 0))
 
-    # # Adjust based on price prediction
-    # price_change_pct = ((price_pred - current_price) / current_price) * 100
-    # if price_change_pct > 0:
-    #     upper *= 1 + (price_change_pct / 100)  # Expand upper range
-    # else:
-    #     lower *= 1 + (price_change_pct / 100)  # Expand lower range
-
-    # Adjust based on volatility prediction
-    VOLATILITY_THRESHOLD = 0.005  # Example: Anything above 0.5% is considered high volatility
     if vol_pred > VOLATILITY_THRESHOLD:
-        volatility_adjustment = min(vol_pred * 10, 0.10)  # Scale adjustment (capped at 10%)
+        volatility_adjustment = min(vol_pred * 10, 0.10)
         lower *= 1 - volatility_adjustment
         upper *= 1 + volatility_adjustment
 
