@@ -92,9 +92,9 @@ Meowfi provides a RESTful Flask API that allows users to query DeFi strategies a
 graph TD
     A[User Input] --> B(NLP Parser)
     B --> C{Query Type}
-    C -->|LP Analysis| D[Data Aggregator]
-    D --> F[Risk Calculator]
-    E --> F
+    C -->D[LP Analysis] 
+    D --> E[Data Aggregator]
+    E --> F[Risk Calculator]
     F --> G[Strategy Optimizer]
     G --> H[Result Formatter]
     H --> I[Flask API]
