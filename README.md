@@ -93,7 +93,6 @@ graph TD
     A[User Input] --> B(NLP Parser)
     B --> C{Query Type}
     C -->|LP Analysis| D[Data Aggregator]
-    C -->|Wallet Analysis| E[On-chain Inspector]
     D --> F[Risk Calculator]
     E --> F
     F --> G[Strategy Optimizer]
