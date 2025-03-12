@@ -1,5 +1,8 @@
 # 🐱 Meowfi - AI-Powered DeFi Liquidity Optimization Agent
 
+**Access MeowFi here - https://meowfi-monad.alloc8.xyz/ (Use Invite code - GMONAD)**
+
+
 **Meowfi** is an advanced AI agent specializing in decentralized finance (DeFi) liquidity pool analysis and strategy optimization. Designed for both novice and experienced liquidity providers, Meowfi combines on-chain data analysis with machine learning to maximize returns while managing risk across Layer 2 ecosystems.
 
 ## 🌟 Key Features
