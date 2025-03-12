@@ -125,6 +125,7 @@ We welcome contributions! Please follow these steps:
 - GPT-4o Mini Language Model
 - Custom ML Models (like allora network for Volatility Prediction)
 
+
 **Data Layer**  
 - The Graph Protocol
 - Pandas/Numpy for Analysis
@@ -132,4 +133,22 @@ We welcome contributions! Please follow these steps:
 
 **Interface**  
 - Flask API
+
+
+### 🌐 Allora Network Integration  
+Meowfi leverages the **Allora Network** to enhance liquidity optimization by incorporating real-time volatility and price predictions into its strategy engine:
+
+- **Volatility-Based Range Adjustments**  
+   Meowfi fetches price and volatility predictions from Allora for supported tokens (e.g., BTC, ETH, SOL).  
+   - If the predicted volatility exceeds a defined threshold, the LP range is widened to reduce risk exposure.  
+   - This helps maintain a balanced position even during high market fluctuations.
+
+- **Dynamic Strategy Tuning**  
+   - Lower and upper LP range limits are adjusted based on Allora’s volatility data.  
+   - For higher predicted volatility, Meowfi increases range width to minimize impermanent loss.  
+   - For stable markets, the range is narrowed to maximize fee collection.  
+
+This ensures that Meowfi’s liquidity strategies are adaptive and responsive to market conditions in real-time.  
+
+
 
